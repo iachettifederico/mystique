@@ -71,22 +71,22 @@ module Mystique
     def self.__class_formats__
       @__class_formats__ ||= __formats__.select {|k, v| k.is_a?(Class)}
     end
+  end
 
-    class Undefined; end
+  class Undefined; end
 
-    module_function
+  module_function
 
-    def present(object, with: nil)
-      from_module &&= "#{from_module.to_s.camelcase}::"
-      presenter_class = case with
-                        when nil
-                          "#{object.class}Presenter".constantize
-                        when Symbol, String
-                          "#{presenter}Presenter".constantize
-                        else
-                          presenter
-                        end
-      presenter_class.present(object)
-    end
+  def present(object, with: nil)
+    from_module &&= "#{from_module.to_s.camelcase}::"
+    presenter_class = case with
+                      when nil
+                        "#{object.class}Presenter".constantize
+                      when Symbol, String
+                        "#{presenter}Presenter".constantize
+                      else
+                        presenter
+                      end
+    presenter_class.present(object)
   end
 end
