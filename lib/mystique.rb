@@ -6,16 +6,15 @@ module Mystique
   class Presenter
     def initialize(object, context)
       @__object__ = object
-      @__context__ = context
+      @__context__ = context || self.class.context
     end
 
     def self.present(object, context=nil)
-      @__context__ = context || self.context
       new(object, context)
     end
 
     def context
-      @__context__ || self.class.context
+      @__context__
     end
     alias :ctx :context
     alias :h :context
@@ -37,20 +36,16 @@ module Mystique
                else
                  value
                end
-      Callable(result).call(value)
+      Callable(result).call(value, context)
     end
 
     def self.context(ctx=Undefined)
       @__context__ = ctx unless ctx == Undefined
       @__context__
     end
-    class << self
-      alias :ctx :context
-      alias :h :context
-    end
 
-    def self.format(key, value)
-      __formats__[key] = value
+    def self.format(key, value=nil, &block)
+      __formats__[key] = block_given? ? block : value
     end
 
     def __formats__
