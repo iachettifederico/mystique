@@ -9,13 +9,16 @@ module Mystique
       @__context__ = context
     end
 
-    def self.present(object)
+    def self.present(object, context=nil)
+      @__context__ = context || self.context
       new(object, context)
     end
 
-    def h
+    def context
       @__context__ || self.class.context
     end
+    alias :ctx :context
+    alias :h :context
 
     def target
       @__object__
@@ -40,6 +43,10 @@ module Mystique
     def self.context(ctx=Undefined)
       @__context__ = ctx unless ctx == Undefined
       @__context__
+    end
+    class << self
+      alias :ctx :context
+      alias :h :context
     end
 
     def self.format(key, value)
@@ -77,7 +84,7 @@ module Mystique
 
   module_function
 
-  def present(object, with: nil)
+  def present(object, with: nil, context: nil)
     from_module &&= "#{from_module.to_s.camelcase}::"
     presenter_class = case with
                       when nil
@@ -87,6 +94,6 @@ module Mystique
                       else
                         presenter
                       end
-    presenter_class.present(object)
+    presenter_class.present(object, context)
   end
 end
