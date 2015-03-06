@@ -5,8 +5,8 @@ require "string_plus"
 module Mystique
   class Presenter
     def initialize(object, context)
-      @__obj__ = object
-      @__ctx__ = context
+      @__object__ = object
+      @__context__ = context
     end
 
     def self.present(object)
@@ -14,11 +14,11 @@ module Mystique
     end
 
     def h
-      @__ctx__ || self.class.context
+      @__context__ || self.class.context
     end
 
     def target
-      @__obj__
+      @__object__
     end
 
     private
@@ -76,9 +76,9 @@ module Mystique
 
     module_function
 
-    def present(object, presenter: nil)
+    def present(object, with: nil)
       from_module &&= "#{from_module.to_s.camelcase}::"
-      presenter_class = case presenter
+      presenter_class = case with
                         when nil
                           "#{object.class}Presenter".constantize
                         when Symbol, String
