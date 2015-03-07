@@ -80,14 +80,13 @@ module Mystique
   module_function
 
   def present(object, with: nil, context: nil)
-    from_module &&= "#{from_module.to_s.camelcase}::"
     presenter_class = case with
                       when nil
                         "#{object.class}Presenter".constantize
                       when Symbol, String
-                        "#{presenter}Presenter".constantize
+                        "#{with}Presenter".constantize
                       else
-                        presenter
+                        with
                       end
     presenter_class.present(object, context)
   end
