@@ -44,10 +44,16 @@ module Mystique
       @__context__
     end
 
-    def self.format(key, value=nil, &block)
-      __formats__[key] = block_given? ? block : value
+    def self.format(matcher, value=nil, &block)
+      __formats__[matcher] = block_given? ? block : value
     end
 
+    def self.format_multiple(*matchers, &block)
+      matchers.each do |matcher|
+        format(matcher, &block)
+      end
+    end
+    
     def __formats__
       self.class.__formats__
     end
