@@ -34,6 +34,17 @@ scope Mystique do
       @presenter = Mystique.present(Abc.new, context: @ctx)
       @presenter.context == @ctx
     end
+
+    spec "it passes the presenter to a block, if the block is given" do
+      @ctx = Object.new
+      @presenter = nil
+      Mystique.present(Object.new, with: AbcPresenter) do |presenter|
+        @presenter = presenter
+      end
+        
+      @presenter.is_a? AbcPresenter
+      
+    end
   end
 
   scope "contexts" do

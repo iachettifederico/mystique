@@ -10,7 +10,9 @@ module Mystique
     end
 
     def self.present(object, context=nil)
-      new(object, context)
+      self.new(object, context).tap do |presenter|
+        yield presenter if block_given?
+      end
     end
 
     def context
@@ -85,7 +87,7 @@ module Mystique
 
   module_function
 
-  def present(object, with: nil, context: nil)
+  def present(object, with: nil, context: nil, &block)
     presenter_class = case with
                       when nil
                         "#{object.class}Presenter".constantize
@@ -94,6 +96,6 @@ module Mystique
                       else
                         with
                       end
-    presenter_class.present(object, context)
+    presenter_class.present(object, context, &block)
   end
 end
