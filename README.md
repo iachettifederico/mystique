@@ -1,8 +1,10 @@
 # Mystique
 
-Welcome to your new gem! In this directory, you'll find the files you need to be able to package up your Ruby library into a gem. Put your Ruby code in the file `lib/mystique`. To experiment with that code, run `bin/console` for an interactive prompt.
+Mystique is a gem that implements the presenter pattern. It allows you to augment an object, by wrapping it and giving it access to the context in which you need to render it.
 
-TODO: Delete this and the text above, and describe your gem
+## Usage
+
+TODO: Write usage instructions here
 
 ## Installation
 
@@ -20,9 +22,6 @@ Or install it yourself as:
 
     $ gem install mystique
 
-## Usage
-
-TODO: Write usage instructions here
 
 ## Development
 
