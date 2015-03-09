@@ -55,7 +55,7 @@ module Mystique
         format(matcher, &block)
       end
     end
-    
+
     def __formats__
       self.class.__formats__
     end
@@ -90,7 +90,11 @@ module Mystique
   def present(object, with: nil, context: nil, &block)
     presenter_class = case with
                       when nil
-                        "#{object.class}Presenter".constantize
+                        begin
+                          "#{object.class}Presenter".constantize
+                        rescue NameError => e
+                          return object
+                        end
                       when Symbol, String
                         "#{with}Presenter".constantize
                       else

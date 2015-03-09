@@ -9,6 +9,12 @@ scope Mystique do
     AbcPresenter = Class.new(Mystique::Presenter)
     CbaPresenter = Class.new(Mystique::Presenter)
 
+    spec "it returns the target object if there's no presenter available" do
+      @target = :a_target
+      @presenter = Mystique.present(@target)
+      @presenter == @target
+    end
+    
     spec "infers presenter class" do
       @presenter = Mystique.present(Abc.new)
       @presenter.is_a? AbcPresenter
