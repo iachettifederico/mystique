@@ -70,4 +70,56 @@ scope Mystique do
       @presenter.gimme_the_ctx == Contexts::Ctx2
     end
   end
+
+  scope "retreiving data" do
+    Retrieve = Struct.new(:a, :b)
+    
+    class RetrieveContext
+      def decorate(attr)
+        ">>>>> #{attr} <<<<<"
+      end
+    end
+    
+    class RetrievePresenter < Mystique::Presenter
+      context RetrieveContext.new
+      
+      def b
+        "FROM PRESENTER: #{target.b}"
+      end
+      
+      def e
+        "E"
+      end
+
+      def f
+        context.decorate(a)
+      end
+    end
+
+    spec "it retrieves from the decorated object if the method is not found on the presenter" do
+      @presenter = Mystique.present(Retrieve.new("A", "B"))
+      @presenter.a == "A"
+    end
+
+    spec "it retrieves from the presenter if the method is available" do
+      @presenter = Mystique.present(Retrieve.new("A", "B"))
+      @presenter.e == "E"
+    end
+
+    spec "it retrieves an overriden method from the presenter" do
+      @presenter = Mystique.present(Retrieve.new("A", "B"))
+      @presenter.b == "FROM PRESENTER: B"
+    end
+
+    spec "it allows to use the context" do
+      @presenter = Mystique.present(Retrieve.new("A", "B"))
+      @presenter.f == ">>>>> A <<<<<"
+    end
+
+    
+  end
+  
+  
+  scope ".format" do
+  end
 end
