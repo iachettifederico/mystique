@@ -1,12 +1,16 @@
 require "mystique/version"
+
 require "callable"
 require "string_plus"
+
+require "mystique/null_context"
+
 
 module Mystique
   class Presenter
     def initialize(object, context)
       @__object__ = object
-      @__context__ = context || self.class.context
+      @__context__ = context || self.class.context || NullContext
     end
 
     def self.present(object, context=nil)

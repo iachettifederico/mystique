@@ -1,8 +1,6 @@
 require "spec_helper"
 require "mystique"
 
-
-
 scope Mystique do
   scope "::present" do
     Abc = Class.new
@@ -67,6 +65,11 @@ scope Mystique do
       end
     end
 
+    spec "null context" do
+      @presenter = Mystique.present(Object.new, with: Mystique::Presenter)
+      @presenter.context == Mystique::NullContext
+    end
+    
     spec "allows to set a context at the class level" do
       @presenter = Mystique.present(Contexts.new)
       @presenter.context == Contexts::Ctx1
