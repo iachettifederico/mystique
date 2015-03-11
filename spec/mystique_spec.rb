@@ -262,13 +262,21 @@ scope Mystique do
       def inspect
         "Conversions Class"
       end
+
+      def to_i
+        42
+      end
     end
-    
+
     class ConversionsPresenter < Mystique::Presenter
       context :my_context
+
+      format Integer, 100
+      
       def to_s
         "A String"
       end
+
     end
 
     let(:presenter) { Mystique.present(Conversions.new) }
@@ -281,6 +289,18 @@ scope Mystique do
 
       spec "to_s" do
         presenter.to_s == "A String"
+      end
+
+      spec "to_i" do
+        presenter.to_i == 42
+      end
+
+      spec "to_whatever" do
+        ex = capture_exception(NoMethodError) do
+          presenter.to_whatever
+        end
+
+        ex.is_a?(NoMethodError)
       end
     end
   end

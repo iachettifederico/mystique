@@ -36,6 +36,7 @@ module Mystique
     private
 
     def method_missing(method, *args, &block)
+      return target.send(method, *args, &block) if method.to_s.start_with?("to_")
       value = target.send(method, *args, &block)
       result = if __formats__.keys.include?(value)
                  __formats__[value]
