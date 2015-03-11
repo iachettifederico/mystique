@@ -29,6 +29,10 @@ module Mystique
       @__object__
     end
 
+    def inspect
+      "<#{self.class}(#{target.inspect}) context: #{context.inspect}>"
+    end
+    
     private
 
     def method_missing(method, *args, &block)

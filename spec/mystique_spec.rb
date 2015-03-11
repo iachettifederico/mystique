@@ -12,7 +12,7 @@ scope Mystique do
       @presenter = Mystique.present(@target)
       @presenter == @target
     end
-    
+
     spec "infers presenter class" do
       @presenter = Mystique.present(Abc.new)
       @presenter.is_a? AbcPresenter
@@ -45,9 +45,9 @@ scope Mystique do
       Mystique.present(Object.new, with: AbcPresenter) do |presenter|
         @presenter = presenter
       end
-        
+
       @presenter.is_a? AbcPresenter
-      
+
     end
   end
 
@@ -69,7 +69,7 @@ scope Mystique do
       @presenter = Mystique.present(Object.new, with: Mystique::Presenter)
       @presenter.context == Mystique::NullContext
     end
-    
+
     spec "allows to set a context at the class level" do
       @presenter = Mystique.present(Contexts.new)
       @presenter.context == Contexts::Ctx1
@@ -249,11 +249,39 @@ scope Mystique do
         super.capitalize
       end
     end
-    
+
     spec "it redirects to the target object" do
       @object = Super.new("super")
       @presenter = Mystique.present(@object)
       @presenter.name == "Super"
+    end
+  end
+
+  scope "conversion methods" do
+    class Conversions
+      def inspect
+        "Conversions Class"
+      end
+    end
+    
+    class ConversionsPresenter < Mystique::Presenter
+      context :my_context
+      def to_s
+        "A String"
+      end
+    end
+
+    let(:presenter) { Mystique.present(Conversions.new) }
+    spec "#inspect" do
+      presenter.inspect == "<ConversionsPresenter(Conversions Class) context: :my_context>"
+    end
+
+    scope "String" do
+      let(:presenter) { Mystique.present(Conversions.new) }
+
+      spec "to_s" do
+        presenter.to_s == "A String"
+      end
     end
   end
 end
