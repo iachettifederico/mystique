@@ -240,4 +240,20 @@ scope Mystique do
       end
     end
   end
+
+  scope "super" do
+    Super = Struct.new(:name)
+
+    class SuperPresenter < Mystique::Presenter
+      def name
+        super.capitalize
+      end
+    end
+    
+    spec "it redirects to the target object" do
+      @object = Super.new("super")
+      @presenter = Mystique.present(@object)
+      @presenter.name == "Super"
+    end
+  end
 end
