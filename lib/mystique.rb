@@ -8,6 +8,10 @@ require "mystique/null_context"
 
 module Mystique
   class Presenter
+    self.methods.each do |m|
+      eval("undef #{m}") if m.to_s.start_with?("to_")
+    end
+
     def initialize(object, context)
       @__object__ = object
       @__context__ = context || self.class.context || NullContext
@@ -32,7 +36,7 @@ module Mystique
     def inspect
       "<#{self.class}(#{target.inspect}) context: #{context.inspect}>"
     end
-    
+
     private
 
     def method_missing(method, *args, &block)

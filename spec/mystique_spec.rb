@@ -266,15 +266,19 @@ scope Mystique do
       def to_i
         42
       end
+
+      def to_f
+        42.5
+      end
     end
 
     class ConversionsPresenter < Mystique::Presenter
       context :my_context
 
       format Integer, 100
-      
-      def to_s
-        "A String"
+
+      def to_f
+        42.0
       end
 
     end
@@ -288,11 +292,15 @@ scope Mystique do
       let(:presenter) { Mystique.present(Conversions.new) }
 
       spec "to_s" do
-        presenter.to_s == "A String"
+         /#<Conversions:0x\h+>/ === presenter.to_s
       end
 
       spec "to_i" do
         presenter.to_i == 42
+      end
+
+      spec "to_f" do
+        presenter.to_i == 42.0
       end
 
       spec "to_whatever" do
