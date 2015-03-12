@@ -117,4 +117,12 @@ module Mystique
                       end
     presenter_class.present(object, context, &block)
   end
+
+  def present_collection(collection, context: nil, &block)
+    return to_enum(:present_collection, collection, context: context, &block) unless block_given?
+
+    collection.each do |element|
+      block.call present(element, context: context)
+    end
+  end
 end

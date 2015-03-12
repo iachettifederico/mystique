@@ -328,7 +328,34 @@ scope Mystique do
       @presenter = Mystique.present(@outer)
 
       @presenter.nested.is_a? NestedPresenter
-     
     end
+  end
+
+  scope ":present_collection" do
+    Element = Struct.new(:str)
+    class ElementPresenter < Mystique::Presenter
+      format(String) { |v| v.upcase }
+    end
+
+    let(:collection) { [ Element.new("a"), Element.new("b"), Element.new("c") ] }
+
+    spec "it returns a Enumerator" do
+      @presenter = Mystique.present_collection(collection)
+      @presenter.is_a? Enumerator
+    end
+
+    spec "it returns a Enumerator that yields presenters" do
+      @presenter = Mystique.present_collection(collection)
+      @presenter.map(&:str) == %w[A B C]
+    end
+
+    spec "it yields presenters" do
+      @presenters = []
+      Mystique.present_collection(collection) do |el|
+        @presenters << el.str
+      end
+      @presenters == %w[A B C]
+    end
+
   end
 end
