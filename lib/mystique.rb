@@ -53,7 +53,7 @@ module Mystique
                else
                  value
                end
-      Callable(result).call(value, context)
+      Mystique.present(Callable(result).call(value, context))
     end
 
     def self.context(ctx=Undefined)

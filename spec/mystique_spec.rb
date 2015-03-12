@@ -292,7 +292,7 @@ scope Mystique do
       let(:presenter) { Mystique.present(Conversions.new) }
 
       spec "to_s" do
-         /#<Conversions:0x\h+>/ === presenter.to_s
+        /#<Conversions:0x\h+>/ === presenter.to_s
       end
 
       spec "to_i" do
@@ -310,6 +310,25 @@ scope Mystique do
 
         ex.is_a?(NoMethodError)
       end
+    end
+  end
+
+  scope "nested objects" do
+    Outer = Struct.new(:nested)
+    Nested = Class.new
+
+    class OuterPresenter < Mystique::Presenter
+    end
+    class NestedPresenter < Mystique::Presenter
+    end
+
+    spec "it presents internal objects" do
+      @nested = Nested.new
+      @outer  = Outer.new(@nested)
+      @presenter = Mystique.present(@outer)
+
+      @presenter.nested.is_a? NestedPresenter
+     
     end
   end
 end
