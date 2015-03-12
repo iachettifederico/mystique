@@ -8,8 +8,10 @@ require "mystique/null_context"
 
 module Mystique
   class Presenter
-    self.methods.each do |m|
-      eval("undef #{m}") if m.to_s.start_with?("to_")
+    self.methods.select {|m| m.to_s.start_with?("to_") }.each do |m|
+      define_method(m) do |*args, &block|
+        target.send(m, *args, &block)
+      end
     end
 
     def initialize(object, context)
