@@ -43,7 +43,10 @@ module Mystique
 
     def method_missing(method, *args, &block)
       return target.send(method, *args, &block) if method.to_s.start_with?("to_")
-      value = target.send(method, *args, &block)
+      format( target.send(method, *args, &block) )
+    end
+
+    def format(value)
       result = if __formats__.keys.include?(value)
                  __formats__[value]
                elsif __regex_formats__.any? { |regex, _| value =~ regex}
@@ -53,9 +56,9 @@ module Mystique
                else
                  value
                end
-      Mystique.present(Callable(result).call(value, context))
+      Mystique.present(Callable(result).call(value, context))      
     end
-
+    
     def self.context(ctx=Undefined)
       @__context__ = ctx unless ctx == Undefined
       @__context__

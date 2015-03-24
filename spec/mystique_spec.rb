@@ -47,7 +47,6 @@ scope Mystique do
       end
 
       @presenter.is_a? AbcPresenter
-
     end
   end
 
@@ -355,6 +354,47 @@ scope Mystique do
         @presenters << el.str
       end
       @presenters == %w[A B C]
+    end
+
+  end
+
+  scope "#format" do
+    InstanceFormat = Struct.new(:value)
+    class InstanceFormatPresenter < Mystique::Presenter
+      format(String) { |v| v.upcase }
+
+      def value
+        format(target.value)
+      end
+
+      def donttouchme
+        target.value
+      end
+
+      def to_s
+        format(target.value)
+      end
+    end
+
+    spec "returns raw value by default" do
+      @format = InstanceFormat.new("a string")
+      @presenter = Mystique.present(@format)
+
+      @presenter.donttouchme == "a string"
+    end
+
+    spec "formats a string" do
+      @format = InstanceFormat.new("a string")
+      @presenter = Mystique.present(@format)
+
+      @presenter.value == "A STRING"
+    end
+
+    spec "formats to_* methods" do
+      @format = InstanceFormat.new("#to_s works!")
+      @presenter = Mystique.present(@format)
+
+      @presenter.value == "#TO_S WORKS!"
     end
 
   end
