@@ -21,12 +21,12 @@ scope HashPresenter do
             }
 
     @expected = {
-                 :a => :b,
-                 :c => @h1,
+                 :a  => :b,
+                 :c  => @h1,
                  @h2 => :d
                 }
-    Mystique.present(@hash).zip(@expected).all? do |res, expected|
+    Mystique.present(@hash).zip(@expected).all? { |res, expected|
       res.first == expected.first
-    end
+    }
   end
 end

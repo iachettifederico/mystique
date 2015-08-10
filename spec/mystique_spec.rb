@@ -398,4 +398,30 @@ scope Mystique do
     end
 
   end
+
+  scope "default formats" do
+    class Mystique::Presenter
+      default_formats do
+        {
+         "defaulter" => "THE DEFAULTER"
+        }
+      end
+    end
+
+    class DefaulterPresenter < Mystique::Presenter
+    end
+
+    class Defaulter
+      def value
+        "defaulter"
+      end
+    end
+
+    spec "uses the default format" do
+      @defaulter = Defaulter.new
+      @presenter = Mystique.present(@defaulter)
+      
+      @presenter.value == "THE DEFAULTER"
+    end
+  end
 end

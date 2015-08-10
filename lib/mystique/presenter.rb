@@ -9,7 +9,7 @@ module Mystique
     end
 
     def initialize(object, context)
-      @__object__ = object
+      @__object__  = object
       @__context__ = context || self.class.context || NullContext
     end
 
@@ -72,10 +72,20 @@ module Mystique
       self.class.__formats__
     end
 
+    def self.default_formats
+      if block_given?
+        @__default_formats__ = yield
+      else
+        @__default_formats__ ||= {}
+      end
+    end
+
+    def default_formats
+      Mystique::Presenter.default_formats
+    end
+    
     def self.__formats__
-      @__formats__ ||= {
-                        nil => "-----",
-                       }
+      @__formats__ ||= Mystique::Presenter.default_formats
     end
 
     def __regex_formats__
