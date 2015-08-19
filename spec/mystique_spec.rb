@@ -226,7 +226,7 @@ scope Mystique do
         @presenter.value == "literal"
       end
 
-      spec "matches regex second first" do
+      spec "matches reg@ex second first" do
         @obj = OpenStruct.new(value: "bye")
         @presenter = Mystique.present(@obj, with: FormatOrderPresenter)
         @presenter.value == "regex"
@@ -303,11 +303,11 @@ scope Mystique do
       end
 
       spec "to_whatever" do
-        ex = capture_exception(NoMethodError) do
+        @ex = capture_exception(NoMethodError) do
           presenter.to_whatever
         end
 
-        ex.is_a?(NoMethodError)
+        @ex.is_a?(NoMethodError)
       end
     end
   end
@@ -430,10 +430,13 @@ scope Mystique do
       use_magic_brackets
 
       format(Date) {|date, _| date.strftime("%b %d, %Y")}
-      
+
       def name
         "THE NAME"
       end
+    end
+
+    class NoMagicBracketsPresenter < Mystique::Presenter
     end
 
     spec "uses the presenter's methods by default" do
@@ -452,6 +455,16 @@ scope Mystique do
       @presenter = Mystique.present({date: Date.new(1981, 6, 12)}, with: MagicBracketsPresenter)
 
       @presenter.date == "Jun 12, 1981"
+    end
+
+    spec "blows up if magic brackets are not enabled" do
+      @presenter = Mystique.present({name: "THE NAME"}, with: NoMagicBracketsPresenter)
+
+      @ex = capture_exception(NoMethodError) do
+        @presenter.name
+      end
+
+      @ex.is_a?(NoMethodError)
     end
   end
 
