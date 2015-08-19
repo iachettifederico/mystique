@@ -38,6 +38,13 @@ module Mystique
     def method_missing(method, *args, &block)
       return target.send(method, *args, &block) if method.to_s.start_with?("to_")
       format( target.send(method, *args, &block) )
+    rescue NoMethodError => ex
+      if use_magic_brackets?
+        format(target.send(:[], *[method].concat(args), &block))
+      else
+        raise ex
+      end
+      
     end
 
     def format(value)
@@ -50,9 +57,9 @@ module Mystique
                else
                  value
                end
-      Mystique.present(Callable(result).call(value, context))      
+      Mystique.present(Callable(result).call(value, context))
     end
-    
+
     def self.context(ctx=Undefined)
       @__context__ = ctx unless ctx == Undefined
       @__context__
@@ -68,10 +75,6 @@ module Mystique
       end
     end
 
-    def __formats__
-      self.class.__formats__
-    end
-
     def self.default_formats
       if block_given?
         @__default_formats__ = yield
@@ -83,7 +86,23 @@ module Mystique
     def default_formats
       Mystique::Presenter.default_formats
     end
+
+    def self.use_magic_brackets
+      @__use_magic_brackets__ = true
+    end
+
+    def self.use_magic_brackets?
+      @__use_magic_brackets__
+    end
     
+    def use_magic_brackets?
+      self.class.use_magic_brackets?
+    end
+    
+    def __formats__
+      self.class.__formats__
+    end
+
     def self.__formats__
       @__formats__ ||= Mystique::Presenter.default_formats
     end

@@ -420,8 +420,39 @@ scope Mystique do
     spec "uses the default format" do
       @defaulter = Defaulter.new
       @presenter = Mystique.present(@defaulter)
-      
+
       @presenter.value == "THE DEFAULTER"
     end
   end
+
+  scope "magic brackets" do
+    class MagicBracketsPresenter < Mystique::Presenter
+      use_magic_brackets
+
+      format(Date) {|date, _| date.strftime("%b %d, %Y")}
+      
+      def name
+        "THE NAME"
+      end
+    end
+
+    spec "uses the presenter's methods by default" do
+      @presenter = Mystique.present(Hash.new, with: MagicBracketsPresenter)
+
+      @presenter.name == "THE NAME"
+    end
+
+    spec "uses the brackets method if the attribute wasn't found" do
+      @presenter = Mystique.present({age: 45}, with: MagicBracketsPresenter)
+
+      @presenter.age == 45
+    end
+
+    spec "formats the brackets method" do
+      @presenter = Mystique.present({date: Date.new(1981, 6, 12)}, with: MagicBracketsPresenter)
+
+      @presenter.date == "Jun 12, 1981"
+    end
+  end
+
 end
