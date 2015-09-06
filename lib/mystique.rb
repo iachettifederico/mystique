@@ -13,12 +13,12 @@ module Mystique
     presenter_class = case with
                       when nil
                         begin
-                          "#{object.class}Presenter".constantize
+                          StringPlus.constantize("#{object.class}Presenter")
                         rescue NameError => e
                           return object
                         end
                       when Symbol, String
-                        "#{with}Presenter".constantize
+                        StringPlus.constantize("#{with}Presenter")
                       else
                         with
                       end
