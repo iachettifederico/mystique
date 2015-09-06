@@ -18,7 +18,7 @@ module Mystique
                           return object
                         end
                       when Symbol, String
-                        StringPlus.constantize("#{with}Presenter")
+                        StringPlus.constantize("#{with.capitalize}Presenter")
                       else
                         with
                       end
