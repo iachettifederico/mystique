@@ -23,6 +23,11 @@ scope Mystique do
       @presenter.is_a? CbaPresenter
     end
 
+    spec "infers presenter class when passing 'with: nil'" do
+      @presenter = Mystique.present(Abc.new, with: nil)
+      @presenter.is_a? AbcPresenter
+    end
+
     spec "allows to pass a symbol for and infer the presenter from it" do
       @presenter = Mystique.present(Abc.new, with: :cba)
       @presenter.is_a? CbaPresenter
