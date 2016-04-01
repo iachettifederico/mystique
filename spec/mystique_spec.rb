@@ -6,6 +6,7 @@ scope Mystique do
     Abc = Class.new
     AbcPresenter = Class.new(Mystique::Presenter)
     CbaPresenter = Class.new(Mystique::Presenter)
+    AbcCbaPresenter = Class.new(Mystique::Presenter)
 
     spec "it returns the target object if there's no presenter available" do
       @target = :a_target
@@ -31,6 +32,16 @@ scope Mystique do
     spec "allows to pass a string for and infer the presenter from it" do
       @presenter = Mystique.present(Abc.new, with: "cba")
       @presenter.is_a? CbaPresenter
+    end
+
+    spec "allows to pass a multiple word underscore separated symbol for and infer the presenter from it" do
+      @presenter = Mystique.present(Abc.new, with: :abc_cba)
+      @presenter.is_a? AbcCbaPresenter
+    end
+
+    spec "allows to pass a multiple word space separated string for and infer the presenter from it" do
+      @presenter = Mystique.present(Abc.new, with: "abc cba")
+      @presenter.is_a? AbcCbaPresenter
     end
 
     spec "allows to pass a context" do
