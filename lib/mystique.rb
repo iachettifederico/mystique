@@ -10,19 +10,12 @@ module Mystique
   module_function
 
   def present(object, with: nil, context: nil, &block)
-    presenter_class = case with
-                      when nil
-                        begin
-                          StringPlus.constantize("#{object.class}Presenter")
-                        rescue NameError
-                          return object
-                        end
-                      when Symbol, String
-                        StringPlus.constantize("#{with}Presenter")
-                      else
-                        with
-                      end
-    presenter_class.present(object, context, &block)
+    begin
+      presenter_class = presenter_class_for(object, with)
+      presenter_class.present(object, context, &block)
+    rescue NameError
+      return object
+    end
   end
 
   def present_collection(collection, context: nil, &block)
@@ -32,4 +25,13 @@ module Mystique
       block.call present(element, context: context)
     end
   end
+
+  def presenter_class_for(object, with)
+    if with.respond_to?(:present)
+      with
+    else
+      StringPlus.constantize("#{with || object.class}Presenter")
+    end
+  end
+  private :presenter_class_for
 end

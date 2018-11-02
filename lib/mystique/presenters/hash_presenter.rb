@@ -1,7 +1,7 @@
 class HashPresenter < Mystique::Presenter
   def each
-    super do |k, v|
-      yield(Mystique.present(k), Mystique.present(v))
+    super do |key, value|
+      yield(Mystique.present(key), Mystique.present(value))
     end
   end
 end

@@ -2,14 +2,8 @@ require "mystique/null_context"
 
 module Mystique
   class Presenter
-    self.methods.select {|m| m.to_s.start_with?("to_") }.each do |m|
-      define_method(m) do |*args, &block|
-        target.send(m, *args, &block)
-      end
-    end
-
     def initialize(object, context)
-      @__object__ = object
+      @__object__  = object
       @__context__ = context || self.class.context || NullContext
     end
 
@@ -73,9 +67,7 @@ module Mystique
     end
 
     def self.__formats__
-      @__formats__ ||= {
-                        nil => "-----",
-                       }
+      @__formats__ ||= { nil => "-----" }
     end
 
     def __regex_formats__
@@ -83,7 +75,7 @@ module Mystique
     end
 
     def self.__regex_formats__
-      @__regex_formats__ ||= __formats__.select {|k, v| k.is_a?(Regexp)}
+      @__regex_formats__ ||= __formats__.select {|key, _| key.is_a?(Regexp)}
     end
 
     def __class_formats__
@@ -91,7 +83,7 @@ module Mystique
     end
 
     def self.__class_formats__
-      @__class_formats__ ||= __formats__.select {|k, v| k.is_a?(Class)}
+      @__class_formats__ ||= __formats__.select {|key, _| key.is_a?(Class)}
     end
   end
 end
