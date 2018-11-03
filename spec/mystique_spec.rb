@@ -409,4 +409,22 @@ scope Mystique do
     end
 
   end
+
+  scope "inheritance" do
+
+    class BasePresenter < Mystique::Presenter
+      format nil, "N/A"
+    end
+
+    class ChildPresenter < BasePresenter
+    end
+
+    Child = Struct.new(:attr)
+
+    spec "it inherits formats" do
+      presenter = Mystique.present(Child.new)
+
+      presenter.attr == 'N/A'
+    end
+  end
 end
