@@ -302,7 +302,7 @@ scope Mystique do
       let(:presenter) { Mystique.present(Conversions.new) }
 
       spec "to_s" do
-        /#<Conversions:0x\h+>/ === presenter.to_s
+        /#<ConversionsPresenter:0x\h+>/ === presenter.to_s
       end
 
       spec "to_i" do
