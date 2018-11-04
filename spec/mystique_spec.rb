@@ -2,6 +2,8 @@ require "spec_helper"
 require "mystique"
 
 scope Mystique do
+  Item = Struct.new(:attr)
+
   scope "::present" do
     Abc = Class.new
     AbcPresenter = Class.new(Mystique::Presenter)
@@ -162,6 +164,12 @@ scope Mystique do
       context WebCtx.new
 
       format nil, "N/A"
+      format_method :a
+      format_method :n
+      format_method :email
+      format_method :val
+      format_method :num
+      format_method :bdate
 
       format "value" do |value|
         value.upcase
@@ -169,7 +177,7 @@ scope Mystique do
 
       format Integer, "I'm a number!"
 
-      format /\w+@\w+\.com/ do |email, context|
+      format(/\w+@\w+\.com/) do |email, context|
         context.link_to(email, "mailto:#{email}")
       end
 
@@ -229,6 +237,8 @@ scope Mystique do
         format String,  "class"
         format "hello", "literal"
         format /bye/,   "regex"
+
+        format_method :value
       end
 
       spec "matches literal first" do
@@ -290,7 +300,6 @@ scope Mystique do
       def to_f
         42.0
       end
-
     end
 
     let(:presenter) { Mystique.present(Conversions.new) }
@@ -323,28 +332,11 @@ scope Mystique do
     end
   end
 
-  scope "nested objects" do
-    Outer = Struct.new(:nested)
-    Nested = Class.new
-
-    class OuterPresenter < Mystique::Presenter
-    end
-    class NestedPresenter < Mystique::Presenter
-    end
-
-    spec "it presents internal objects" do
-      @nested = Nested.new
-      @outer  = Outer.new(@nested)
-      @presenter = Mystique.present(@outer)
-
-      @presenter.nested.is_a? NestedPresenter
-    end
-  end
-
   scope ":present_collection" do
     Element = Struct.new(:str)
     class ElementPresenter < Mystique::Presenter
       format(String) { |v| v.upcase }
+      format_method :str
     end
 
     let(:collection) { [ Element.new("a"), Element.new("b"), Element.new("c") ] }
@@ -366,7 +358,6 @@ scope Mystique do
       end
       @presenters == %w[A B C]
     end
-
   end
 
   scope "#format" do
@@ -407,16 +398,15 @@ scope Mystique do
 
       @presenter.value == "#TO_S WORKS!"
     end
-
   end
 
   scope "inheritance" do
-
     class BasePresenter < Mystique::Presenter
       format nil, "N/A"
     end
 
     class ChildPresenter < BasePresenter
+      format_method :attr
     end
 
     Child = Struct.new(:attr)
@@ -426,5 +416,68 @@ scope Mystique do
 
       presenter.attr == 'N/A'
     end
+  end
+
+  scope "presenting and formatting" do
+    PresentedClass = Class.new
+    class PresentedClassPresenter < Mystique::Presenter
+    end
+
+    spec "it delegates to the presented object" do
+      delegate_to_item_presenter = Class.new(Mystique::Presenter) do
+        format nil, "N/A"
+      end
+
+      presenter = delegate_to_item_presenter.present(Item.new(nil))
+
+      presenter.attr == nil
+    end
+
+    spec "it formats the attr method" do
+      format_item_attr_presenter = Class.new(Mystique::Presenter) do
+        format nil, "N/A"
+        format_method :attr
+      end
+
+      presenter = format_item_attr_presenter.present(Item.new(nil))
+
+      presenter.attr == "N/A"
+    end
+
+    spec "it presents the attr method" do
+      present_item_attr_presenter = Class.new(Mystique::Presenter) do
+        format nil, "N/A"
+        present_method :attr
+      end
+
+      presenter = present_item_attr_presenter.present(Item.new(PresentedClass.new))
+
+      presenter.attr.is_a?(PresentedClassPresenter)
+    end
+
+    spec "it presents the attr method if it's formatted and presented" do
+      present_item_attr_presenter = Class.new(Mystique::Presenter) do
+        format nil, "N/A"
+        format_method :attr
+        present_method :attr
+      end
+
+      presenter = present_item_attr_presenter.present(Item.new(PresentedClass.new))
+
+      presenter.attr.is_a?(PresentedClassPresenter)
+    end
+
+    spec "it formats the attr method if it's formatted and presented" do
+      present_item_attr_presenter = Class.new(Mystique::Presenter) do
+        format nil, "N/A"
+        format_method :attr
+        present_method :attr
+      end
+
+      presenter = present_item_attr_presenter.present(Item.new(nil))
+
+      presenter.attr == 'N/A'
+    end
+
   end
 end

@@ -31,21 +31,38 @@ module Mystique
 
     def method_missing(method, *args, &block)
       return target.send(method, *args, &block) if method.to_s.start_with?("to_")
-      format( target.send(method, *args, &block) )
+
+      value = target.send(method, *args, &block)
+
+      case
+      when formatted_method?(method)
+        format( value )
+      when presented_method?(method)
+        Mystique.present(value, context: context)
+      else
+        value
+      end
+    end
+
+    # Add format_method and present_method to the class
+    def formatted_method?(method)
+      __formatted_methods__.include?(method)
+    end
+
+    def presented_method?(method)
+      __presented_methods__.include?(method)
     end
 
     def format(value)
-      result = case
-               when __formats__.keys.include?(value)
+      result = if __formats__.keys.include?(value)
                  __formats__[value]
-               when __regex_formats__.any? { |regex, _| value =~ regex}
+               elsif __regex_formats__.any? { |regex, _| value =~ regex}
                  __regex_formats__.select { |regex, _| value =~ regex}.first.last
-               when __class_formats__.any? { |klass, _| value.is_a?(klass)}
+               elsif __class_formats__.any? { |klass, _| value.is_a?(klass)}
                  __class_formats__.select { |klass, _| value.is_a?(klass)}.first.last
                else
                  value
                end
-
       Mystique.present(Callable(result).call(value, context))
     end
 
@@ -55,7 +72,40 @@ module Mystique
     end
 
     def self.format(matcher, value=nil, &block)
-      __formats__[matcher] = block_given? ? block : value
+        __formats__[matcher] = block_given? ? block : value
+    end
+
+    def self.format_method(matcher)
+      if matcher.is_a?(Symbol)
+        __formatted_methods__ << matcher
+      end
+    end
+    
+    def self.format_and_present_method(matcher)
+      format_method(method)
+      present_method(method)
+    end
+    
+    def self.present_method(matcher)
+      if matcher.is_a?(Symbol)
+        __presented_methods__ << matcher
+      end
+    end
+
+    def self.__presented_methods__
+      @__presented_methods__ ||= []
+    end
+
+    def self.__formatted_methods__
+      @__formatted_methods__ ||= []
+    end
+
+    def __presented_methods__
+      self.class.__presented_methods__
+    end
+
+    def __formatted_methods__
+      self.class.__formatted_methods__
     end
 
     def self.format_multiple(*matchers, &block)
@@ -89,3 +139,13 @@ module Mystique
     end
   end
 end
+
+
+
+
+
+
+
+
+
+
