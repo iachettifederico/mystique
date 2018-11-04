@@ -74,21 +74,21 @@ module Mystique
       __formats__[matcher] = block_given? ? block : value
     end
 
-    def self.format_method(matcher)
+    def self.format(matcher)
       if matcher.is_a?(Symbol)
         __formatted_methods__ << matcher
       end
     end
 
-    def self.format_and_present_method(matcher)
-      format_method(method)
-      present_method(method)
-    end
-
-    def self.present_method(matcher)
+    def self.present(matcher)
       if matcher.is_a?(Symbol)
         __presented_methods__ << matcher
       end
+    end
+
+    def self.format_and_present(matcher)
+      format_method(method)
+      present_method(method)
     end
 
     def self.__presented_methods__

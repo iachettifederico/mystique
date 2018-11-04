@@ -164,12 +164,12 @@ scope Mystique do
       context WebCtx.new
 
       apply_format nil, "N/A"
-      format_method :a
-      format_method :n
-      format_method :email
-      format_method :val
-      format_method :num
-      format_method :bdate
+      format :a
+      format :n
+      format :email
+      format :val
+      format :num
+      format :bdate
 
       apply_format "value" do |value|
         value.upcase
@@ -238,7 +238,7 @@ scope Mystique do
         apply_format "hello", "literal"
         apply_format(/bye/, "regex")
 
-        format_method :value
+        format :value
       end
 
       spec "matches literal first" do
@@ -336,7 +336,7 @@ scope Mystique do
     Element = Struct.new(:str)
     class ElementPresenter < Mystique::Presenter
       apply_format(String) { |v| v.upcase }
-      format_method :str
+      format :str
     end
 
     let(:collection) { [ Element.new("a"), Element.new("b"), Element.new("c") ] }
@@ -415,7 +415,7 @@ scope Mystique do
     end
 
     class ChildPresenter < BasePresenter
-      format_method :attr
+      format :attr
     end
 
     Child = Struct.new(:attr)
@@ -445,7 +445,7 @@ scope Mystique do
     spec "it formats the attr method" do
       format_item_attr_presenter = Class.new(Mystique::Presenter) do
         apply_format nil, "N/A"
-        format_method :attr
+        format :attr
       end
 
       presenter = format_item_attr_presenter.for(Item.new(nil))
@@ -456,7 +456,7 @@ scope Mystique do
     spec "it presents the attr method" do
       present_item_attr_presenter = Class.new(Mystique::Presenter) do
         apply_format nil, "N/A"
-        present_method :attr
+        present :attr
       end
 
       presenter = present_item_attr_presenter.for(Item.new(PresentedClass.new))
@@ -467,8 +467,8 @@ scope Mystique do
     spec "it presents the attr method if it's formatted and presented" do
       present_item_attr_presenter = Class.new(Mystique::Presenter) do
         apply_format nil, "N/A"
-        format_method :attr
-        present_method :attr
+        format :attr
+        present :attr
       end
 
       presenter = present_item_attr_presenter.for(Item.new(PresentedClass.new))
@@ -479,8 +479,8 @@ scope Mystique do
     spec "it formats the attr method if it's formatted and presented" do
       present_item_attr_presenter = Class.new(Mystique::Presenter) do
         apply_format nil, "N/A"
-        format_method :attr
-        present_method :attr
+        format :attr
+        present :attr
       end
 
       presenter = present_item_attr_presenter.for(Item.new(nil))
