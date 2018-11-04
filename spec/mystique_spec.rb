@@ -341,14 +341,23 @@ scope Mystique do
 
     let(:collection) { [ Element.new("a"), Element.new("b"), Element.new("c") ] }
 
-    spec "it returns a Enumerator" do
-      @presenter = Mystique.present_collection(collection)
-      @presenter.is_a? Enumerator
-    end
+      spec "it returns a Enumerator" do
+        @presenter = Mystique.present_collection(collection)
+        @presenter.is_a? Enumerator
+      end
 
     spec "it returns a Enumerator that yields presenters" do
       @presenter = Mystique.present_collection(collection)
       @presenter.map(&:str) == %w[A B C]
+    end
+
+    spec "it returns a Enumerator that yields presenters" do
+      @presenter = Mystique.present_collection(collection)
+      @result = @presenter.map { |presenter, element|
+        [presenter.str, element.str]
+      }
+
+      @result == [['A', 'a'], ['B', 'b'], ['C', 'c']]
     end
 
     spec "it yields presenters" do

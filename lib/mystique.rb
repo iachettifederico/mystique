@@ -22,7 +22,12 @@ module Mystique
     return to_enum(:present_collection, collection, context: context, &block) unless block_given?
 
     collection.each do |element|
-      block.call present(element, context: context)
+      case block.arity
+      when 2
+        block.call( present(element, context: context), element )
+      else
+        block.call(present(element, context: context))
+      end
     end
   end
 
