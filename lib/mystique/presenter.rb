@@ -44,7 +44,6 @@ module Mystique
       end
     end
 
-    # Add format_method and present_method to the class
     def formatted_method?(method)
       __formatted_methods__.include?(method)
     end
@@ -71,8 +70,8 @@ module Mystique
       @__context__
     end
 
-    def self.format(matcher, value=nil, &block)
-        __formats__[matcher] = block_given? ? block : value
+    def self.apply_format(matcher, value=nil, &block)
+      __formats__[matcher] = block_given? ? block : value
     end
 
     def self.format_method(matcher)
@@ -80,12 +79,12 @@ module Mystique
         __formatted_methods__ << matcher
       end
     end
-    
+
     def self.format_and_present_method(matcher)
       format_method(method)
       present_method(method)
     end
-    
+
     def self.present_method(matcher)
       if matcher.is_a?(Symbol)
         __presented_methods__ << matcher
@@ -110,7 +109,7 @@ module Mystique
 
     def self.format_multiple(*matchers, &block)
       matchers.each do |matcher|
-        format(matcher, &block)
+        apply_format(matcher, &block)
       end
     end
 
@@ -139,13 +138,3 @@ module Mystique
     end
   end
 end
-
-
-
-
-
-
-
-
-
-

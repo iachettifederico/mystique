@@ -163,7 +163,7 @@ scope Mystique do
     class FormatPresenter < Mystique::Presenter
       context WebCtx.new
 
-      format nil, "N/A"
+      apply_format nil, "N/A"
       format_method :a
       format_method :n
       format_method :email
@@ -171,13 +171,13 @@ scope Mystique do
       format_method :num
       format_method :bdate
 
-      format "value" do |value|
+      apply_format "value" do |value|
         value.upcase
       end
 
-      format Integer, "I'm a number!"
+      apply_format Integer, "I'm a number!"
 
-      format(/\w+@\w+\.com/) do |email, context|
+      apply_format(/\w+@\w+\.com/) do |email, context|
         context.link_to(email, "mailto:#{email}")
       end
 
@@ -185,7 +185,7 @@ scope Mystique do
         value.to_date.strftime("%-d %b %Y")
       end
 
-      format Float do |value, ctx|
+      apply_format Float do |value, ctx|
         ctx.number_to_currency(value)
       end
     end
@@ -234,9 +234,9 @@ scope Mystique do
 
     scope "order of formats" do
       class FormatOrderPresenter < Mystique::Presenter
-        format String,  "class"
-        format "hello", "literal"
-        format /bye/,   "regex"
+        apply_format String,  "class"
+        apply_format "hello", "literal"
+        apply_format(/bye/, "regex")
 
         format_method :value
       end
@@ -295,7 +295,7 @@ scope Mystique do
     class ConversionsPresenter < Mystique::Presenter
       context :my_context
 
-      format Integer, 100
+      apply_format Integer, 100
 
       def to_f
         42.0
@@ -335,16 +335,16 @@ scope Mystique do
   scope ":present_collection" do
     Element = Struct.new(:str)
     class ElementPresenter < Mystique::Presenter
-      format(String) { |v| v.upcase }
+      apply_format(String) { |v| v.upcase }
       format_method :str
     end
 
     let(:collection) { [ Element.new("a"), Element.new("b"), Element.new("c") ] }
 
-      spec "it returns a Enumerator" do
-        @presenter = Mystique.present_collection(collection)
-        @presenter.is_a? Enumerator
-      end
+    spec "it returns a Enumerator" do
+      @presenter = Mystique.present_collection(collection)
+      @presenter.is_a? Enumerator
+    end
 
     spec "it returns a Enumerator that yields presenters" do
       @presenter = Mystique.present_collection(collection)
@@ -372,7 +372,7 @@ scope Mystique do
   scope "#format" do
     InstanceFormat = Struct.new(:value)
     class InstanceFormatPresenter < Mystique::Presenter
-      format(String) { |v| v.upcase }
+      apply_format(String) { |v| v.upcase }
 
       def value
         format(target.value)
@@ -411,7 +411,7 @@ scope Mystique do
 
   scope "inheritance" do
     class BasePresenter < Mystique::Presenter
-      format nil, "N/A"
+      apply_format nil, "N/A"
     end
 
     class ChildPresenter < BasePresenter
@@ -434,7 +434,7 @@ scope Mystique do
 
     spec "it delegates to the presented object" do
       delegate_to_item_presenter = Class.new(Mystique::Presenter) do
-        format nil, "N/A"
+        apply_format nil, "N/A"
       end
 
       presenter = delegate_to_item_presenter.for(Item.new(nil))
@@ -444,7 +444,7 @@ scope Mystique do
 
     spec "it formats the attr method" do
       format_item_attr_presenter = Class.new(Mystique::Presenter) do
-        format nil, "N/A"
+        apply_format nil, "N/A"
         format_method :attr
       end
 
@@ -455,7 +455,7 @@ scope Mystique do
 
     spec "it presents the attr method" do
       present_item_attr_presenter = Class.new(Mystique::Presenter) do
-        format nil, "N/A"
+        apply_format nil, "N/A"
         present_method :attr
       end
 
@@ -466,7 +466,7 @@ scope Mystique do
 
     spec "it presents the attr method if it's formatted and presented" do
       present_item_attr_presenter = Class.new(Mystique::Presenter) do
-        format nil, "N/A"
+        apply_format nil, "N/A"
         format_method :attr
         present_method :attr
       end
@@ -478,7 +478,7 @@ scope Mystique do
 
     spec "it formats the attr method if it's formatted and presented" do
       present_item_attr_presenter = Class.new(Mystique::Presenter) do
-        format nil, "N/A"
+        apply_format nil, "N/A"
         format_method :attr
         present_method :attr
       end
