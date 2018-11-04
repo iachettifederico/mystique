@@ -12,7 +12,7 @@ module Mystique
   def present(object, with: nil, context: nil, &block)
     begin
       presenter_class = presenter_class_for(object, with)
-      presenter_class.present(object, context, &block)
+      presenter_class.for(object, context, &block)
     rescue NameError
       return object
     end
@@ -27,7 +27,7 @@ module Mystique
   end
 
   def presenter_class_for(object, with)
-    if with.respond_to?(:present)
+    if with.respond_to?(:for)
       with
     else
       StringPlus.constantize("#{with || object.class}Presenter")

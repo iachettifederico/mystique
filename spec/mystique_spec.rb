@@ -428,7 +428,7 @@ scope Mystique do
         format nil, "N/A"
       end
 
-      presenter = delegate_to_item_presenter.present(Item.new(nil))
+      presenter = delegate_to_item_presenter.for(Item.new(nil))
 
       presenter.attr == nil
     end
@@ -439,7 +439,7 @@ scope Mystique do
         format_method :attr
       end
 
-      presenter = format_item_attr_presenter.present(Item.new(nil))
+      presenter = format_item_attr_presenter.for(Item.new(nil))
 
       presenter.attr == "N/A"
     end
@@ -450,7 +450,7 @@ scope Mystique do
         present_method :attr
       end
 
-      presenter = present_item_attr_presenter.present(Item.new(PresentedClass.new))
+      presenter = present_item_attr_presenter.for(Item.new(PresentedClass.new))
 
       presenter.attr.is_a?(PresentedClassPresenter)
     end
@@ -462,7 +462,7 @@ scope Mystique do
         present_method :attr
       end
 
-      presenter = present_item_attr_presenter.present(Item.new(PresentedClass.new))
+      presenter = present_item_attr_presenter.for(Item.new(PresentedClass.new))
 
       presenter.attr.is_a?(PresentedClassPresenter)
     end
@@ -474,7 +474,7 @@ scope Mystique do
         present_method :attr
       end
 
-      presenter = present_item_attr_presenter.present(Item.new(nil))
+      presenter = present_item_attr_presenter.for(Item.new(nil))
 
       presenter.attr == 'N/A'
     end

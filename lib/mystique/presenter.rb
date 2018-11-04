@@ -7,7 +7,7 @@ module Mystique
       @__context__ = context || self.class.context || NullContext
     end
 
-    def self.present(object, context=nil)
+    def self.for(object, context=nil)
       self.new(object, context).tap do |presenter|
         yield presenter if block_given?
       end
