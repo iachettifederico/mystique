@@ -5,8 +5,14 @@ require "ostruct"
 
 describe Mystique do
   describe "::present" do
-    Abc = Class.new
+    Abc = Struct.new(:str) do
+      def inspect
+        "Abc Class"
+      end
+    end
+
     AbcPresenter = Class.new(Mystique::Presenter)
+
     CbaPresenter = Class.new(Mystique::Presenter)
 
     it "it returns the target object if there's no presenter available" do
@@ -39,22 +45,15 @@ describe Mystique do
         expect(presenter).to be_a(AbcPresenter)
       end
     end
+
+    it "#inspect" do
+      presenter = Mystique.present(Abc.new, context: :my_context)
+
+      expect(presenter.inspect).to eql("<AbcPresenter(Abc Class) context: :my_context>")
+    end
   end
 
   describe "contexts" do
-    # Contexts = Class.new
-
-    # Contexts::Ctx1 = :ctx1
-    # Contexts::Ctx2 = :ctx2
-
-    # class ContextsPresenter < Mystique::Presenter
-    #   context Contexts::Ctx1
-
-    #   def gimme_the_ctx
-    #     context
-    #   end
-    # end
-
     it "null context" do
       presenter = Mystique.present(Object.new, with: Mystique::Presenter)
 
@@ -276,11 +275,11 @@ describe Mystique do
           format :value
         end
       }
-      
+
       it "matches literal first" do
         obj = OpenStruct.new(value: "hello")
         presenter = Mystique.present(obj, with: presenter_class)
-        
+
         expect(presenter.value).to eql("literal")
       end
 
@@ -301,150 +300,155 @@ describe Mystique do
   end
 
   describe "super" do
-    Super = Struct.new(:name)
+    it "it redirects to the target object" do
+      target_class = Struct.new(:name)
 
-    class SuperPresenter < Mystique::Presenter
-      def name
-        super.capitalize
+      presenter_class = Class.new(Mystique::Presenter) do
+        def name
+          super.capitalize
+        end
       end
-    end
 
-    xit "it redirects to the target object" do
-      @object = Super.new("super")
-      @presenter = Mystique.present(@object)
-      @presenter.name == "Super"
+      presenter = Mystique.present(target_class.new("Super"))
+      expect(presenter.name).to eql("Super")
     end
   end
 
   describe "conversion methods" do
-    class Conversions
-      def inspect
-        "Conversions Class"
+    let(:target) {
+      Class.new do
+        def inspect
+          "Conversions Class"
+        end
+
+        def to_i
+          42
+        end
+
+        def to_f
+          42.5
+        end
+      end.new
+    }
+
+    let(:presenter_class) {
+      Class.new(Mystique::Presenter) do
+        context :my_context
+
+        apply_format Integer, 100
+
+        def to_f
+          42.0
+        end
       end
+    }
 
-      def to_i
-        42
-      end
-
-      def to_f
-        42.5
-      end
-    end
-
-    class ConversionsPresenter < Mystique::Presenter
-      context :my_context
-
-      apply_format Integer, 100
-
-      def to_f
-        42.0
-      end
-    end
-
-    let(:presenter) { Mystique.present(Conversions.new) }
-    xit "#inspect" do
-      presenter.inspect == "<ConversionsPresenter(Conversions Class) context: :my_context>"
-    end
+    let(:presenter) { Mystique.present(target, with: presenter_class) }
 
     describe "String" do
-      let(:presenter) { Mystique.present(Conversions.new) }
-
-      xit "to_s" do
+      it "to_s" do
         /#<ConversionsPresenter:0x\h+>/ === presenter.to_s
       end
 
-      xit "to_i" do
+      it "to_i" do
         presenter.to_i == 42
       end
 
-      xit "to_f" do
+      it "to_f" do
         presenter.to_i == 42.0
       end
 
-      xit "to_whatever" do
-        ex = capture_exception(NoMethodError) do
-          presenter.to_whatever
-        end
-
-        ex.is_a?(NoMethodError)
+      it "to_whatever" do
+        expect { presenter.to_whatever }.to raise_error(NoMethodError)
       end
     end
   end
 
   describe ":present_collection" do
     Element = Struct.new(:str)
+
     class ElementPresenter < Mystique::Presenter
       apply_format(String) { |v| v.upcase }
+
       format :str
     end
 
-    let(:collection) { [ Element.new("a"), Element.new("b"), Element.new("c") ] }
 
-    xit "it returns a Enumerator" do
-      @presenter = Mystique.present_collection(collection)
-      @presenter.is_a? Enumerator
+    let(:collection) {
+      [
+        Element.new("a"),
+        Element.new("b"),
+        Element.new("c"),
+      ]
+    }
+
+    let(:presenter) { Mystique.present_collection(collection) }
+
+    it "it returns a Enumerator" do
+      expect(presenter).to be_a(Enumerator)
     end
 
-    xit "it returns a Enumerator that yields presenters" do
-      @presenter = Mystique.present_collection(collection)
-      @presenter.map(&:str) == %w[A B C]
+    it "it returns a Enumerator that yields presenters" do
+      expect(presenter.map(&:str)).to eql(%w[A B C])
     end
 
-    xit "it returns a Enumerator that yields presenters" do
-      @presenter = Mystique.present_collection(collection)
-      @result = @presenter.map { |presenter, element|
+    it "it returns a Enumerator that yields presenters" do
+      result = presenter.map { |presenter, element|
         [presenter.str, element.str]
       }
 
-      @result == [['A', 'a'], ['B', 'b'], ['C', 'c']]
+      expect(result).to eql([['A', 'a'], ['B', 'b'], ['C', 'c']])
     end
 
-    xit "it yields presenters" do
-      @presenters = []
+    it "it yields presenters" do
+      presenters = []
       Mystique.present_collection(collection) do |el|
-        @presenters << el.str
+        presenters << el.str
       end
-      @presenters == %w[A B C]
+
+      expect(presenters).to eql(%w[A B C])
     end
   end
 
   describe "#format" do
-    InstanceFormat = Struct.new(:value)
-    class Instancepresenter_class < Mystique::Presenter
-      apply_format(String) { |v| v.upcase }
+    let(:target_class) { Struct.new(:value) }
+    let(:presenter_class) {
+      Class.new(Mystique::Presenter) do
+        apply_format(String) { |v| v.upcase }
 
-      def value
-        format(target.value)
-      end
+        def value
+          format(target.value)
+        end
 
-      def donttouchme
-        target.value
-      end
+        def donttouchme
+          target.value
+        end
 
-      def to_s
-        format(target.value)
+        def to_s
+          format(target.value)
+        end
       end
+    }
+
+    it "returns raw value by default" do
+      target = target_class.new("a string")
+      presenter = Mystique.present(target, with: presenter_class)
+
+      expect(presenter.donttouchme).to eql("a string")
     end
 
-    xit "returns raw value by default" do
-      @format = InstanceFormat.new("a string")
-      @presenter = Mystique.present(@format)
+    it "formats a string" do
+      target = target_class.new("a string")
+      presenter = Mystique.present(target, with: presenter_class)
 
-      @presenter.donttouchme == "a string"
+      expect(presenter.value).to eql("A STRING")
     end
 
-    xit "formats a string" do
-      @format = InstanceFormat.new("a string")
-      @presenter = Mystique.present(@format)
+    it "formats to_* methods" do
+      target = target_class.new("#to_s works!")
+      presenter = Mystique.present(target, with: presenter_class)
 
-      @presenter.value == "A STRING"
-    end
-
-    xit "formats to_* methods" do
-      @format = InstanceFormat.new("#to_s works!")
-      @presenter = Mystique.present(@format)
-
-      @presenter.value == "#TO_S WORKS!"
+      expect(presenter.value).to eql("#TO_S WORKS!")
     end
   end
 
@@ -459,29 +463,30 @@ describe Mystique do
 
     Child = Struct.new(:attr)
 
-    xit "it inherits formats" do
+    it "it inherits formats" do
       presenter = Mystique.present(Child.new)
 
-      presenter.attr == 'N/A'
+      expect(presenter.attr).to eql('N/A')
     end
   end
 
   describe "presenting and formatting" do
+    Item = Struct.new(:attr)
     PresentedClass = Class.new
     class PresentedClassPresenter < Mystique::Presenter
     end
 
-    xit "it delegates to the presented object" do
+    it "it delegates to the presented object" do
       delegate_to_item_presenter = Class.new(Mystique::Presenter) do
         apply_format nil, "N/A"
       end
 
       presenter = delegate_to_item_presenter.for(Item.new(nil))
 
-      presenter.attr == nil
+      expect(presenter.attr).to eql(nil)
     end
 
-    xit "it formats the attr method" do
+    it "it formats the attr method" do
       format_item_attr_presenter = Class.new(Mystique::Presenter) do
         apply_format nil, "N/A"
         format :attr
@@ -489,10 +494,10 @@ describe Mystique do
 
       presenter = format_item_attr_presenter.for(Item.new(nil))
 
-      presenter.attr == "N/A"
+      expect(presenter.attr).to eql("N/A")
     end
 
-    xit "it presents the attr method" do
+    it "it presents the attr method" do
       present_item_attr_presenter = Class.new(Mystique::Presenter) do
         apply_format nil, "N/A"
         present :attr
@@ -500,10 +505,10 @@ describe Mystique do
 
       presenter = present_item_attr_presenter.for(Item.new(PresentedClass.new))
 
-      presenter.attr.is_a?(PresentedClassPresenter)
+      expect(presenter.attr).to be_a(PresentedClassPresenter)
     end
 
-    xit "it presents the attr method if it's formatted and presented" do
+    it "it presents the attr method if it's formatted and presented" do
       present_item_attr_presenter = Class.new(Mystique::Presenter) do
         apply_format nil, "N/A"
         format :attr
@@ -512,10 +517,10 @@ describe Mystique do
 
       presenter = present_item_attr_presenter.for(Item.new(PresentedClass.new))
 
-      presenter.attr.is_a?(PresentedClassPresenter)
+      expect(presenter.attr).to be_a(PresentedClassPresenter)
     end
 
-    xit "it formats the attr method if it's formatted and presented" do
+    it "it formats the attr method if it's formatted and presented" do
       present_item_attr_presenter = Class.new(Mystique::Presenter) do
         apply_format nil, "N/A"
         format :attr
@@ -524,7 +529,7 @@ describe Mystique do
 
       presenter = present_item_attr_presenter.for(Item.new(nil))
 
-      presenter.attr == 'N/A'
+      expect(presenter.attr).to eql('N/A')
     end
 
   end
