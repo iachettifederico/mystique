@@ -2,7 +2,7 @@ require "spec_helper"
 require "mystique"
 require "mystique/presenters/hash_presenter"
 
-scope HashPresenter do
+describe HashPresenter do
   Hash1 = Class.new
   Hash2 = Class.new
 
@@ -11,7 +11,7 @@ scope HashPresenter do
   class Hash2Presenter < Mystique::Presenter
   end
 
-  spec "it presents keys and values" do
+  it "presents keys and values" do
     @h1 = Hash1
     @h2 = Hash2
     @hash = {
@@ -25,8 +25,9 @@ scope HashPresenter do
                  :c => @h1,
                  @h2 => :d
                 }
-    Mystique.present(@hash).zip(@expected).all? do |res, expected|
-      res.first == expected.first
+    
+    Mystique.present(@hash).zip(@expected).each do |res, expected|
+      expect(res.first).to eql(expected.first)
     end
   end
 end

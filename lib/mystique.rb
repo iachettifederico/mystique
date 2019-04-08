@@ -32,11 +32,7 @@ module Mystique
   end
 
   def presenter_class_for(object, with)
-    if with.respond_to?(:for)
-      with
-    else
-      StringPlus.constantize("#{with || object.class}Presenter")
-    end
+    with || StringPlus.constantize("#{object.class}Presenter")
   end
   private :presenter_class_for
 end
