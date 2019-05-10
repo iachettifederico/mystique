@@ -100,10 +100,10 @@ describe Mystique do
     let(:item) { Struct.new(:a, :b).new("A", "B") }
 
     let(:context) { Class.new do
-        def decorate(attr)
-          ">>>>> #{attr} <<<<<"
-        end
-      end.new
+                      def decorate(attr)
+                        ">>>>> #{attr} <<<<<"
+                      end
+                    end.new
     }
 
     let(:presenter_class) {

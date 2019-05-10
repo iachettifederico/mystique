@@ -2,6 +2,8 @@ require "mystique/null_context"
 
 module Mystique
   class Presenter
+    FORMATS = {}
+
     def initialize(object, context)
       @__object__  = object
       @__context__ = context || self.class.context || NullContext
@@ -118,7 +120,7 @@ module Mystique
     end
 
     def self.__formats__
-      @@__formats__ ||= {}
+      FORMATS
     end
 
     def __regex_formats__
