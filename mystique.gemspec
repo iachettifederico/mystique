@@ -24,5 +24,4 @@ Gem::Specification.new do |spec|
   spec.add_development_dependency "rspec"
   spec.add_development_dependency "pry-byebug"
   spec.add_runtime_dependency "callable"
-  spec.add_runtime_dependency "string_plus"
 end

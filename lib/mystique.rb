@@ -1,7 +1,6 @@
 require "mystique/version"
 
 require "callable"
-require "string_plus"
 
 require "mystique/undefined"
 require "mystique/presenter"
@@ -32,7 +31,7 @@ module Mystique
   end
 
   def presenter_class_for(object, with)
-    with || StringPlus.constantize("#{object.class}Presenter")
+    with || Object.send(:const_get, "#{object.class}Presenter")
   end
   private :presenter_class_for
 end
