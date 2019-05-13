@@ -41,6 +41,8 @@ module Mystique
         format( value )
       when presented_method?(method)
         Mystique.present(value, context: context)
+      when presented_collection?(method)
+        Mystique.present_collection(value, context: context, &block)
       else
         value
       end
@@ -52,6 +54,10 @@ module Mystique
 
     def presented_method?(method)
       __presented_methods__.include?(method)
+    end
+
+    def presented_collection?(method)
+      __presented_collections__.include?(method)
     end
 
     def format(value)
@@ -88,6 +94,13 @@ module Mystique
       end
     end
 
+    # TODO: Define this
+    def self.present_collection(matcher)
+      if matcher.is_a?(Symbol)
+        __presented_collections__ << matcher
+      end
+    end
+
     def self.format_and_present(matcher)
       format_method(method)
       present_method(method)
@@ -97,12 +110,20 @@ module Mystique
       @__presented_methods__ ||= []
     end
 
+    def self.__presented_collections__
+      @__presented_collections__ ||= []
+    end
+
     def self.__formatted_methods__
       @__formatted_methods__ ||= []
     end
 
     def __presented_methods__
       self.class.__presented_methods__
+    end
+
+    def __presented_collections__
+      self.class.__presented_collections__
     end
 
     def __formatted_methods__

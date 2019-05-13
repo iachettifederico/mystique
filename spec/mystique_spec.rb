@@ -408,6 +408,13 @@ describe Mystique do
 
       expect(presenters).to eql(%w[A B C])
     end
+
+    it "allows passing a presenter" do
+      my_presenter_class = Class.new(Mystique::Presenter)
+      presenters = Mystique.present_collection(collection, with: my_presenter_class)
+
+      expect(presenters.map(&:class).uniq).to eql([my_presenter_class])
+    end
   end
 
   describe "#format" do
@@ -532,5 +539,29 @@ describe Mystique do
       expect(presenter.attr).to eql('N/A')
     end
 
+    describe "present collection" do
+
+      let(:list_class) {
+        Class.new do
+          def all
+            [
+              Element.new('one'),
+              Element.new('two'),
+            ]
+          end
+        end
+      }
+
+      it "presents a collection" do
+        list_presenter_class = Class.new(Mystique::Presenter) do
+          present_collection :all
+        end
+
+        presenter = Mystique.present(list_class.new, with: list_presenter_class)
+
+        expect(presenter.all.map(&:class)).to eql([ElementPresenter, ElementPresenter])
+        expect(presenter.all.map(&:str)).to eql(["ONE", "TWO"])
+      end
+    end
   end
 end

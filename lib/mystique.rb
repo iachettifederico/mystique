@@ -18,15 +18,15 @@ module Mystique
     end
   end
 
-  def present_collection(collection, context: nil, &block)
-    return to_enum(:present_collection, collection, context: context, &block) unless block_given?
+  def present_collection(collection, context: nil, with: nil, &block)
+    return to_enum(:present_collection, collection, context: context, with: with, &block) unless block_given?
 
     collection.each do |element|
       case block.arity
       when 2
-        block.call( present(element, context: context), element )
+        block.call( present(element, context: context, with: with), element )
       else
-        block.call(present(element, context: context))
+        block.call(present(element, context: context, with: with))
       end
     end
   end
