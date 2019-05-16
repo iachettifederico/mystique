@@ -365,14 +365,15 @@ describe Mystique do
   end
 
   describe ":present_collection" do
-    Element = Struct.new(:str)
+    before(:all) do
+      Element = Struct.new(:str)
 
-    class ElementPresenter < Mystique::Presenter
-      apply_format(String) { |v| v.upcase }
+      ElementPresenter = Class.new(Mystique::Presenter) do
+        apply_format(String) { |v| v.upcase }
 
-      format :str
+        format :str
+      end
     end
-
 
     let(:collection) {
       [
@@ -480,8 +481,7 @@ describe Mystique do
   describe "presenting and formatting" do
     Item = Struct.new(:attr)
     PresentedClass = Class.new
-    class PresentedClassPresenter < Mystique::Presenter
-    end
+    PresentedClassPresenter = Class.new(Mystique::Presenter)
 
     it "it delegates to the presented object" do
       delegate_to_item_presenter = Class.new(Mystique::Presenter) do
@@ -540,13 +540,22 @@ describe Mystique do
     end
 
     describe "present collection" do
+      before(:all) do
+        ListElement = Struct.new(:str)
+
+        ListElementPresenter = Class.new(Mystique::Presenter) do
+          apply_format(String) { |v| v.upcase }
+
+          format :str
+        end
+      end
 
       let(:list_class) {
         Class.new do
           def all
             [
-              Element.new('one'),
-              Element.new('two'),
+              ListElement.new('one'),
+              ListElement.new('two'),
             ]
           end
         end
@@ -559,7 +568,7 @@ describe Mystique do
 
         presenter = Mystique.present(list_class.new, with: list_presenter_class)
 
-        expect(presenter.all.map(&:class)).to eql([ElementPresenter, ElementPresenter])
+        expect(presenter.all.map(&:class)).to eql([ListElementPresenter, ListElementPresenter])
         expect(presenter.all.map(&:str)).to eql(["ONE", "TWO"])
       end
     end
