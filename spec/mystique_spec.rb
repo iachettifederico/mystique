@@ -4,17 +4,22 @@ require "time"
 require "ostruct"
 
 describe Mystique do
-  describe "::present" do
-    Abc = Struct.new(:str) do
-      def inspect
-        "Abc Class"
-      end
+  Abc = Struct.new(:str) do
+    def inspect
+      "Abc Class"
     end
+  end
 
-    AbcPresenter = Class.new(Mystique::Presenter)
+  AbcPresenter = Class.new(Mystique::Presenter) do
+    def namespace_str
+      nil
+    end
+  end
 
-    CbaPresenter = Class.new(Mystique::Presenter)
+  CbaPresenter = Class.new(Mystique::Presenter)
 
+
+  describe "::present" do
     it "it returns the target object if there's no presenter available" do
       target    = :a_target
       presenter = Mystique.present(target)
@@ -572,5 +577,55 @@ describe Mystique do
         expect(presenter.all.map(&:str)).to eql(["ONE", "TWO"])
       end
     end
+  end
+
+  context "namespacing" do
+    module Namespace
+      AbcPresenter = Class.new(Mystique::Presenter) do
+        def str
+          "Namespaced"
+        end
+      end
+    end
+    module Namespace
+      module Nested
+        AbcPresenter = Class.new(Mystique::Presenter) do
+          def str
+            "Nested inside a namespace"
+          end
+        end
+      end
+    end
+
+    it "allows namespacing" do
+      presenter = Mystique.present(Abc.new)
+      expect(presenter.str).to eql(nil)
+
+      presenter = Mystique.present(Abc.new, namespace: Namespace)
+      expect(presenter.str).to eql('Namespaced')
+    end
+
+    it "allows namespacing on collections" do
+      items = [Abc.new, Abc.new]
+
+      Mystique.present_collection(items) do |presenter|
+        expect(presenter.str).to eql(nil)
+      end
+
+      Mystique.present_collection(items, namespace: Namespace) do |presenter|
+        expect(presenter.str).to eql('Namespaced')
+      end
+
+      Mystique.present_collection(items, namespace: Namespace) do |presenter, item|
+        expect(presenter.str).to eql('Namespaced')
+      end
+
+    end
+
+    it "allows nested namespacing" do
+      presenter = Mystique.present(Abc.new, namespace: Namespace::Nested)
+      expect(presenter.str).to eql('Nested inside a namespace')
+    end
+
   end
 end
