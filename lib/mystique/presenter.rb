@@ -34,18 +34,18 @@ module Mystique
     def method_missing(method, *args, &block)
       return target.send(method, *args, &block) if method.to_s.start_with?("to_")
 
-      value = target.send(method, *args, &block)
-
-      case
-      when formatted_method?(method)
-        format( value )
-      when presented_method?(method)
-        Mystique.present(value, context: context)
-      when presented_collection?(method)
-        Mystique.present_collection(value, context: context, &block)
-      else
-        value
-      end
+      target.send(method, *args, &block).yield_self { |value|
+        case
+        when formatted_method?(method)
+          format( value )
+        when presented_method?(method)
+          Mystique.present(value, context: context)
+        when presented_collection?(method)
+          Mystique.present_collection(value, context: context, &block)
+        else
+          value
+        end
+      }
     end
 
     def formatted_method?(method)
