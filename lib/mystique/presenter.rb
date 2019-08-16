@@ -61,15 +61,17 @@ module Mystique
     end
 
     def format(value)
-      result = if __formats__.keys.include?(value)
+      result = case
+               when __formats__.keys.include?(value)
                  __formats__[value]
-               elsif __regex_formats__.any? { |regex, _| value =~ regex}
+               when __regex_formats__.any? { |regex, _| value =~ regex}
                  __regex_formats__.select { |regex, _| value =~ regex}.first.last
-               elsif __class_formats__.any? { |klass, _| value.is_a?(klass)}
+               when __class_formats__.any? { |klass, _| value.is_a?(klass)}
                  __class_formats__.select { |klass, _| value.is_a?(klass)}.first.last
                else
                  value
                end
+
       Mystique.present(Callable(result).call(value, context))
     end
 
@@ -94,7 +96,6 @@ module Mystique
       end
     end
 
-    # TODO: Define this
     def self.present_collection(matcher)
       if matcher.is_a?(Symbol)
         __presented_collections__ << matcher
