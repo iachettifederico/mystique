@@ -10,9 +10,9 @@ module Mystique
     end
 
     def self.for(object, context=nil)
-      self.new(object, context).tap do |presenter|
+      new(object, context).tap { |presenter|
         yield presenter if block_given?
-      end
+      }
     end
 
     def context
