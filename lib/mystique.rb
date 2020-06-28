@@ -3,12 +3,14 @@ require "mystique/version"
 require "callable"
 
 require "mystique/undefined"
+require "mystique/presenter_class"
 require "mystique/presenter"
 
 module Mystique
+
   def self.present(object, with: nil, context: nil, &block)
     begin
-      presenter_class = presenter_class_for(object, with)
+      presenter_class = PresenterClass.new(object, with).to_class
       presenter_class.for(object, context, &block)
     rescue NameError
       return object
