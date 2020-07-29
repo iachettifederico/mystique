@@ -21,20 +21,20 @@ module Mystique
     alias :ctx :context
     alias :h :context
 
-    def target
+    def o
       @__object__
     end
 
     def inspect
-      "<#{self.class}(#{target.inspect}) context: #{context.inspect}>"
+      "<#{self.class}(#{o.inspect}) context: #{context.inspect}>"
     end
 
     private
 
     def method_missing(method, *args, &block)
-      return target.send(method, *args, &block) if method.to_s.start_with?("to_")
+      return o.send(method, *args, &block) if method.to_s.start_with?("to_")
 
-      target.send(method, *args, &block).yield_self { |value|
+      o.send(method, *args, &block).yield_self { |value|
         case
         when formatted_method?(method)
           format( value )

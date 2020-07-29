@@ -110,7 +110,7 @@ describe Mystique do
       Class.new(Mystique::Presenter) do |a|
 
         def b
-          "FROM PRESENTER: #{target.b}"
+          "FROM PRESENTER: #{o.b}"
         end
 
         def e
@@ -425,15 +425,15 @@ describe Mystique do
         apply_format(String) { |v| v.upcase }
 
         def value
-          format(target.value)
+          format(o.value)
         end
 
         def donttouchme
-          target.value
+          o.value
         end
 
         def to_s
-          format(target.value)
+          format(o.value)
         end
       end
     }
